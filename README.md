@@ -48,7 +48,7 @@ A full-stack AI simulation of a search-and-rescue drone swarm where a supervisor
 
 ## Core Features
 
-- Supervisor/worker role separation — one reasoning LLM, zero per-drone LLM calls during execution
+- Supervisor/worker role separation 
 - Real terrain: SRTM elevation + OpenStreetMap building density over a 2km × 2km area
 - Battery-feasible sector assignment with greedy fallback replan
 - Live drone-failure injection with automatic sector redistribution
