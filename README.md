@@ -34,8 +34,6 @@ A full-stack AI simulation of a search-and-rescue drone swarm where a supervisor
 
 ---
 
----
-
 ## 3. Core Features
 
 - Supervisor/worker role separation 
