@@ -1,35 +1,47 @@
 #!/usr/bin/env python3
-"""
-Run once: generates backend/data/merapi_elevation_20x20.json
-SRTM source array has row 0 = north (image convention). We flip it on ingestion
-so the output JSON follows project convention: row 0 = south, row 19 = north.
-"""
-import json, numpy as np, rasterio
+import sys
+from pathlib import Path
+
+# Add the project root to Python's path so it can find the 'backend' module
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+import rasterio
 from rasterio.enums import Resampling
 from rasterio.windows import from_bounds
+import numpy as np
+import json
 
-# Grid config — must match terrain.py and config.py constants
-# Anchor = southwest corner of the 4km × 4km search box
-ANCHOR_LAT = -7.6650       # SW corner latitude
-ANCHOR_LNG = 110.4195        # SW corner longitude
-AREA_KM    = 4.0
-GRID_N     = 20
-TILE_M     = (AREA_KM * 1000) / GRID_N   # 200m
+# NOW the import will work perfectly
+from backend.config import ANCHOR_LAT, ANCHOR_LNG, TILE_M, GRID_N, AREA_M
 
-LAT_PER_KM = 1 / 110.574
-LNG_PER_KM = 1 / (111.320 * np.cos(np.deg2rad(ANCHOR_LAT + AREA_KM * LAT_PER_KM / 2)))
-
+# Use the config values for the SW corner
+west = ANCHOR_LNG
 south = ANCHOR_LAT
-north = ANCHOR_LAT + AREA_KM * LAT_PER_KM
-west  = ANCHOR_LNG
-east  = ANCHOR_LNG + AREA_KM * LNG_PER_KM
 
-SRC_TIF = "backend/data/srtm_59_14.tif"
+# Calculate the NE corner based on the 2km (AREA_M) search area
+# Using the standard degree conversion formulas from your guide
+east = west + (AREA_M / (111320 * np.cos(np.deg2rad(south))))
+north = south + (AREA_M / 110574)
+
+print(f"DEBUG: Calculated Ranau Bounds: W={west}, S={south}, E={east}, N={north}")
+
+SRC_TIF = "backend/data/srtm_60_11.tif"
 
 with rasterio.open(SRC_TIF) as src:
+    # 1. Print the bounds to see what the script is actually calculating
+    print(f"DEBUG: Requested Bounds: W={west}, S={south}, E={east}, N={north}")
+    print(f"DEBUG: SRTM Tile Bounds: {src.bounds}")
+
+    # 2. Create the window
     window = from_bounds(west, south, east, north, src.transform)
-    # resample to exactly 20x20, averaging contributing pixels
-    # rasterio output: row 0 = NORTH (image convention)
+    
+    # 3. CLAMP the window to the tile size (fixes the 'Requested 6000' error)
+    # This ensures the window is intersectioned with the actual image dimensions
+    window = window.intersection(rasterio.windows.Window(0, 0, src.width, src.height))
+    
+    print(f"DEBUG: Clamped Window: {window}")
+
+    # 4. Perform the read
     arr_image = src.read(
         1, window=window,
         out_shape=(GRID_N, GRID_N),

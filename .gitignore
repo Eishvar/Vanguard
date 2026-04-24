@@ -1,0 +1,23 @@
+.gitnexus
+
+# Metadata junk
+*.Zone.Identifier
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.env
+
+# Frontend
+node_modules/
+dist/
+.next/
+
+# AI/Tool specific
+.claude/
+
+# Mission logs (prevent temporary logs from being committed)
+mission_log.json
+backend/mission_log.json
