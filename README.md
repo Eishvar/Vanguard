@@ -1,4 +1,4 @@
-## 2. Tech Stack
+## 1. Tech Stack
 
 ### Backend
 
@@ -26,7 +26,7 @@
 
 ---
 
-## 3. GitHub README
+## 2. GitHub README
 
 # VANGUARD — Multi-Agent LLM Drone Swarm
 
@@ -34,19 +34,9 @@ A full-stack AI simulation of a search-and-rescue drone swarm where a supervisor
 
 ---
 
-## How It Works
-
-**Supervisor / worker architecture.** A single supervisor LLM (configurable via `SUPERVISOR_MODEL`) handles all strategic reasoning: it calls MCP tools to discover the fleet, reads real elevation and building-density data for a 20×20 tile grid over Ranau, Sabah, and assigns terrain sectors to each drone using battery-budget constraints. The three drones are pure path-followers — they execute pre-computed lawnmower sweep paths with no per-drone LLM call, keeping inference costs near zero during execution.
-
-**Self-healing on failure.** Any drone can be failed mid-mission (via the dashboard or API). On the next monitor round, the supervisor detects the offline unit, identifies its incomplete sectors, and triggers an algorithmic replan that redistributes the remaining tiles to active drones within their battery budgets. The handoff split is visualised live on the map.
-
-**MCP as the agent-environment interface.** The supervisor and orchestrator interact with simulation state exclusively through a FastMCP server (13 tools: `discover_drones`, `scan_tile`, `mark_sector_complete`, `inject_drone_failure`, etc.). This clean separation means the LLM never touches Python objects directly — it calls tools, reads structured responses, and reasons about them.
-
-**Live tactical dashboard.** Every mission event (drone movement, sector scan, survivor alert, phase change, comms drop) is pushed to the browser over Server-Sent Events with no polling. The React dashboard renders a MapLibre satellite map with real GeoJSON overlays, per-drone telemetry cards, survivor priority reports, and a searchable mission log — all updating in real time.
-
 ---
 
-## Core Features
+## 3. Core Features
 
 - Supervisor/worker role separation 
 - Real terrain: SRTM elevation + OpenStreetMap building density over a 2km × 2km area
@@ -60,7 +50,7 @@ A full-stack AI simulation of a search-and-rescue drone swarm where a supervisor
 
 ---
 
-## Tech Stack
+## 4. Tech Stack
 
 **Backend:** Python · FastAPI · FastMCP · LiteLLM · Pydantic · asyncio · uvicorn
 
@@ -68,7 +58,7 @@ A full-stack AI simulation of a search-and-rescue drone swarm where a supervisor
 
 ---
 
-## Project Structure
+## 5. Project Structure
 
 ```
 backend/
@@ -104,7 +94,7 @@ frontend/src/
 
 ---
 
-## Getting Started
+## 6. Getting Started
 
 **Prerequisites:** Python 3.11+, Node 20+, a model API key.
 
